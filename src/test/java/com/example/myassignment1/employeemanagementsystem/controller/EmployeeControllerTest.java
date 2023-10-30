@@ -57,6 +57,7 @@ public class EmployeeControllerTest {
         response.setEmail(request.getEmail());
         response.setPosition(request.getPosition());
         response.setDepartment(depResponse);
+
         when(employeeService.addNewEmployee(request)).thenReturn(response);
 
         String path = "/employees";
@@ -117,10 +118,19 @@ public class EmployeeControllerTest {
         EmployeeRequest request = new EmployeeRequest();
         request.setFirstName("test");
         request.setLastName("user");
+        request.setEmail("test@gmail.com");
+        request.setPosition("HR");
+
+        DepartmentRequest departmentRequest = new DepartmentRequest();
+        departmentRequest.setName("Admin");
+        request.setDepartment(departmentRequest);
+
         EmployeeResponse response = new EmployeeResponse();
         response.setId(employeeId);
         response.setFirstName("test");
         response.setLastName("user");
+        response.setEmail("test@gmail.com");
+        response.setPosition("HR");
 
         when(employeeService.updateEmployeeById(employeeId, request)).thenReturn(response);
 

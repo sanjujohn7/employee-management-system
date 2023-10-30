@@ -41,10 +41,10 @@ public class EmployeeServiceTest {
         employeeRequest.setLastName("user");
         employeeRequest.setEmail("test@example.com");
         employeeRequest.setPosition("Manager");
-
         Department department = Department.builder()
                 .name("HR")
                 .build();
+
         when(departmentRepository.save(any(Department.class))).thenReturn(department);
 
         Employee savedEmployee = Employee.builder()
@@ -55,6 +55,7 @@ public class EmployeeServiceTest {
                 .department(department)
                 .position("Manager")
                 .build();
+
         when(employeeRepository.save(any(Employee.class))).thenReturn(savedEmployee);
 
         EmployeeResponse employeeResponse = employeeService.addNewEmployee(employeeRequest);
@@ -150,10 +151,10 @@ public class EmployeeServiceTest {
         employeeRequest.setLastName("updatedLastName");
         employeeRequest.setEmail("updated@example.com");
         employeeRequest.setPosition("updatedPosition");
-
         Department department = Department.builder()
                 .name("HR")
                 .build();
+
         when(departmentRepository.save(any(Department.class))).thenReturn(department);
 
         Employee existingEmployee = Employee.builder()
