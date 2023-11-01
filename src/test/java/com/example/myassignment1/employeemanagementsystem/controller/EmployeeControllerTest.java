@@ -34,15 +34,16 @@ public class EmployeeControllerTest {
 
     @Test
     public void testAddNewEmployee() throws Exception{
-        EmployeeRequest request = new EmployeeRequest();
-        request.setFirstName("test");
-        request.setLastName("user");
-        request.setEmail("test@example.com");
-        request.setPosition("Software Engineer");
         DepartmentRequest departmentRequest = DepartmentRequest.builder()
                 .name("Java")
                 .build();
-        request.setDepartment(departmentRequest);
+        EmployeeRequest request = EmployeeRequest.builder()
+                .firstName("test")
+                .lastName("user")
+                .email("test@example.com")
+                .department(departmentRequest)
+                .position("Software Engineer")
+                .build();
 
         DepartmentResponse depResponse = DepartmentResponse.builder()
         .id(1L)
@@ -50,13 +51,14 @@ public class EmployeeControllerTest {
         .managerId(1L)
         .build();
 
-        EmployeeResponse response = new EmployeeResponse();
-        response.setId(1L);
-        response.setFirstName(request.getFirstName());
-        response.setLastName(request.getLastName());
-        response.setEmail(request.getEmail());
-        response.setPosition(request.getPosition());
-        response.setDepartment(depResponse);
+        EmployeeResponse response = EmployeeResponse.builder()
+                .id(1L)
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .department(depResponse)
+                .position(request.getPosition())
+                .build();
 
         when(employeeService.addNewEmployee(request)).thenReturn(response);
 
@@ -94,12 +96,13 @@ public class EmployeeControllerTest {
     @Test
     public void testFindEmployeeById() throws Exception{
         Long employeeId = 1L;
-        EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setId(employeeId);
-        employeeResponse.setFirstName("Ishan");
-        employeeResponse.setLastName("Kumar");
-        employeeResponse.setEmail("ik@gmail.com");
-        employeeResponse.setPosition("Admin");
+        EmployeeResponse employeeResponse = EmployeeResponse.builder()
+                .id(employeeId)
+                .firstName("Ishan")
+                .lastName("Kumar")
+                .email("ik@gmail.com")
+                .position("Admin")
+                .build();
 
         when(employeeService.findEmployeeById(employeeId)).thenReturn(employeeResponse);
 
@@ -115,22 +118,24 @@ public class EmployeeControllerTest {
     @Test
     public void testUpdateEmployeeById() throws Exception{
         Long employeeId = 1L;
-        EmployeeRequest request = new EmployeeRequest();
-        request.setFirstName("test");
-        request.setLastName("user");
-        request.setEmail("test@gmail.com");
-        request.setPosition("HR");
+        DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                .name("Admin")
+                .build();
+        EmployeeRequest request = EmployeeRequest.builder()
+                .firstName("test")
+                .lastName("user")
+                .email("test@gmail.com")
+                .department(departmentRequest)
+                .position("HR")
+                .build();
 
-        DepartmentRequest departmentRequest = new DepartmentRequest();
-        departmentRequest.setName("Admin");
-        request.setDepartment(departmentRequest);
-
-        EmployeeResponse response = new EmployeeResponse();
-        response.setId(employeeId);
-        response.setFirstName("test");
-        response.setLastName("user");
-        response.setEmail("test@gmail.com");
-        response.setPosition("HR");
+        EmployeeResponse response = EmployeeResponse.builder()
+                .id(employeeId)
+                .firstName("test")
+                .lastName("user")
+                .email("test@gmail.com")
+                .position("HR")
+                .build();
 
         when(employeeService.updateEmployeeById(employeeId, request)).thenReturn(response);
 
