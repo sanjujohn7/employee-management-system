@@ -1,12 +1,12 @@
 package com.example.myassignment1.employeemanagementsystem.contract;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
 @Builder
 public class DepartmentResponse {

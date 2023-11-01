@@ -1,5 +1,6 @@
 package com.example.myassignment1.employeemanagementsystem.service;
 
+import com.example.myassignment1.employeemanagementsystem.contract.DepartmentRequest;
 import com.example.myassignment1.employeemanagementsystem.contract.EmployeeRequest;
 import com.example.myassignment1.employeemanagementsystem.contract.EmployeeResponse;
 import com.example.myassignment1.employeemanagementsystem.exception.DeleteNotSuccessException;
@@ -36,17 +37,28 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testAddNewEmployee(){
+     void testAddNewEmployee(){
+        Department department = null;
+        DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                .name("HR")
+                .build();
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .firstName("test")
                 .lastName("user")
                 .email("test@example.com")
+                .department(departmentRequest)
                 .position("Manager")
                 .build();
-        Department department = Department.builder()
-                .name("HR")
-                .build();
-
+        if (employeeRequest.getDepartment() != null && employeeRequest.getDepartment().getName() != null){
+            Optional<Department> optionalDepartment = departmentRepository.findByNameIgnoreCase(employeeRequest.getDepartment().getName());
+        if(optionalDepartment.isPresent()){
+            department = optionalDepartment.get();
+        }else{
+            department = Department.builder()
+                    .name("HR")
+                    .build();
+        }
+        }
         when(departmentRepository.save(any(Department.class))).thenReturn(department);
 
         Employee savedEmployee = Employee.builder()
@@ -73,22 +85,31 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testListAllEmployees(){
+     void testListAllEmployees(){
         List<Employee> employees = new ArrayList<>();
+        Department department1 = Department.builder()
+                .id(1L)
+                .name("department1")
+                .build();
         Employee employee1 = Employee.builder()
                 .id(1L)
                 .firstName("test1")
                 .lastName("user1")
                 .email("test1@gmail.com")
+                .department(department1)
                 .position("Engineer")
                 .build();
         employees.add(employee1);
-
+        Department department2 = Department.builder()
+                .id(2L)
+                .name("department2")
+                .build();
         Employee employee2 = Employee.builder()
                 .id(2L)
                 .firstName("test2")
                 .lastName("user2")
                 .email("test2@gmail.com")
+                .department(department2)
                 .position("Developer")
                 .build();
         employees.add(employee2);
@@ -101,7 +122,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testListAllEmployees_NotFound(){
+     void testListAllEmployees_throws_Exception(){
         List<Employee> employees = new ArrayList<>();
 
         when(employeeRepository.findAll()).thenReturn(employees);
@@ -113,12 +134,18 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testFindEmployeeById(){
+     void testFindEmployeeById(){
+        Department department = Department.builder()
+                .id(5L)
+                .name("test-department")
+                .managerId(4L)
+                .build();
         Employee employee = Employee.builder()
                 .id(1L)
                 .firstName("test")
                 .lastName("user")
                 .email("test@gmail.com")
+                .department(department)
                 .position("Manager")
                 .build();
 
@@ -135,7 +162,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testFindEmployeeById_NotFound() {
+     void testFindEmployeeById_throws_Exception() {
 
         when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -146,7 +173,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testDeleteAnEmployeeById() {
+     void testDeleteAnEmployeeById() {
         Employee existingEmployee = Employee.builder()
                 .id(1L)
                 .build();
@@ -160,7 +187,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testDeleteAnEmployeeById_NotFound() {
+     void testDeleteAnEmployeeById_throws_Exception() {
         when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
 
         EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () -> {
@@ -170,7 +197,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testDeleteAnEmployeeById_Failure() {
+     void testDeleteAnEmployeeById_throws_Failure() {
         long employeeId = 1L;
         Employee existingEmployee = Employee.builder()
                 .id(employeeId)
@@ -186,16 +213,25 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testUpdateEmployeeById(){
+     void testUpdateEmployeeById(){
+        DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                .name("HR")
+                .build();
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .firstName("updatedFirstName")
                 .lastName("updatedLastName")
                 .email("updated@example.com")
+                .department(departmentRequest)
                 .position("updatedPosition")
                 .build();
-        Department department = Department.builder()
-                .name("HR")
-                .build();
+        Department department = null;
+        if (employeeRequest.getDepartment() != null){
+                  department = Department.builder()
+                    .id(1L)
+                    .name("HR")
+                    .managerId(2L)
+                    .build();
+        }
 
         when(departmentRepository.save(any(Department.class))).thenReturn(department);
 
@@ -232,7 +268,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testUpdateEmployeeById_NotFound(){
+     void testUpdateEmployeeById_throws_Exception(){
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .firstName("updatedFirstName")
                 .lastName("updatedLastName")
