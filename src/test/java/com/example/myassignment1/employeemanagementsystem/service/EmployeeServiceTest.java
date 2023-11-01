@@ -2,6 +2,7 @@ package com.example.myassignment1.employeemanagementsystem.service;
 
 import com.example.myassignment1.employeemanagementsystem.contract.EmployeeRequest;
 import com.example.myassignment1.employeemanagementsystem.contract.EmployeeResponse;
+import com.example.myassignment1.employeemanagementsystem.exception.DeleteNotSuccessException;
 import com.example.myassignment1.employeemanagementsystem.exception.EmployeeNotFoundException;
 import com.example.myassignment1.employeemanagementsystem.model.Department;
 import com.example.myassignment1.employeemanagementsystem.model.Employee;
@@ -36,11 +37,12 @@ public class EmployeeServiceTest {
 
     @Test
     public void testAddNewEmployee(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
-        employeeRequest.setFirstName("test");
-        employeeRequest.setLastName("user");
-        employeeRequest.setEmail("test@example.com");
-        employeeRequest.setPosition("Manager");
+        EmployeeRequest employeeRequest = EmployeeRequest.builder()
+                .firstName("test")
+                .lastName("user")
+                .email("test@example.com")
+                .position("Manager")
+                .build();
         Department department = Department.builder()
                 .name("HR")
                 .build();
@@ -99,6 +101,18 @@ public class EmployeeServiceTest {
     }
 
     @Test
+    public void testListAllEmployees_NotFound(){
+        List<Employee> employees = new ArrayList<>();
+
+        when(employeeRepository.findAll()).thenReturn(employees);
+
+        EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () -> {
+            employeeService.listAllEmployees();
+        });
+        assertEquals("No employees found", exception.getMessage());
+    }
+
+    @Test
     public void testFindEmployeeById(){
         Employee employee = Employee.builder()
                 .id(1L)
@@ -125,9 +139,10 @@ public class EmployeeServiceTest {
 
         when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(EmployeeNotFoundException.class, () -> {
+        EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () -> {
             employeeService.findEmployeeById(1L);
         });
+        assertEquals("Employee not found", exception.getMessage());
     }
 
     @Test
@@ -145,12 +160,39 @@ public class EmployeeServiceTest {
     }
 
     @Test
+    public void testDeleteAnEmployeeById_NotFound() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () -> {
+            employeeService.deleteAnEmployeeById(1L);
+        });
+        assertEquals("Employee not found", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteAnEmployeeById_Failure() {
+        long employeeId = 1L;
+        Employee existingEmployee = Employee.builder()
+                .id(employeeId)
+                .build();
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(existingEmployee));
+        when(employeeRepository.existsById(1L)).thenReturn(true);
+
+        DeleteNotSuccessException exception = assertThrows(DeleteNotSuccessException.class, () -> {
+            employeeService.deleteAnEmployeeById(1L);
+        });
+        assertEquals("Failed to delete the employee with ID " +employeeId, exception.getMessage());
+    }
+
+    @Test
     public void testUpdateEmployeeById(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
-        employeeRequest.setFirstName("updatedFirstName");
-        employeeRequest.setLastName("updatedLastName");
-        employeeRequest.setEmail("updated@example.com");
-        employeeRequest.setPosition("updatedPosition");
+        EmployeeRequest employeeRequest = EmployeeRequest.builder()
+                .firstName("updatedFirstName")
+                .lastName("updatedLastName")
+                .email("updated@example.com")
+                .position("updatedPosition")
+                .build();
         Department department = Department.builder()
                 .name("HR")
                 .build();
@@ -187,5 +229,22 @@ public class EmployeeServiceTest {
         assertEquals("updatedLastName", employeeResponse.getLastName());
         assertEquals("updated@example.com", employeeResponse.getEmail());
         assertEquals("updatedPosition", employeeResponse.getPosition());
+    }
+
+    @Test
+    public void testUpdateEmployeeById_NotFound(){
+        EmployeeRequest employeeRequest = EmployeeRequest.builder()
+                .firstName("updatedFirstName")
+                .lastName("updatedLastName")
+                .email("updated@example.com")
+                .position("updatedPosition")
+                .build();
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () -> {
+            employeeService.updateEmployeeById(1L, employeeRequest);
+        });
+        assertEquals("Employee not found", exception.getMessage());
     }
 }
