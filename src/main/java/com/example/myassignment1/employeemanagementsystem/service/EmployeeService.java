@@ -6,6 +6,7 @@ import com.example.myassignment1.employeemanagementsystem.contract.EmployeeReque
 import com.example.myassignment1.employeemanagementsystem.exception.DeleteNotSuccessException;
 import com.example.myassignment1.employeemanagementsystem.exception.EmployeeNotFoundException;
 import com.example.myassignment1.employeemanagementsystem.model.Department;
+import com.example.myassignment1.employeemanagementsystem.model.DepartmentName;
 import com.example.myassignment1.employeemanagementsystem.model.Employee;
 import com.example.myassignment1.employeemanagementsystem.repository.DepartmentRepository;
 import com.example.myassignment1.employeemanagementsystem.repository.EmployeeRepository;
@@ -28,17 +29,23 @@ public class EmployeeService {
     public EmployeeResponse addNewEmployee(EmployeeRequest employeeRequest) {
         Department department = null;
         if (employeeRequest.getDepartment() != null && employeeRequest.getDepartment().getName() != null){
+            DepartmentName requestedDepName =
+                    DepartmentName.valueOf(employeeRequest.getDepartment().getName().trim().toUpperCase());
 
-            Optional<Department> optionalDepartment =
-                    departmentRepository.findByNameIgnoreCase(employeeRequest.getDepartment().getName());
+            if (requestedDepName != null){
+                Optional<Department> optionalDepartment =
+                        departmentRepository.findByName(requestedDepName);
 
-            if (optionalDepartment.isPresent()) {
-                department = optionalDepartment.get();
+                if (optionalDepartment.isPresent()) {
+                    department = optionalDepartment.get();
+                }else{
+                    department = Department.builder()
+                            .name(requestedDepName)
+                            .build();
+                    department = departmentRepository.save(department);
+                }
             }else{
-                department = Department.builder()
-                        .name(employeeRequest.getDepartment().getName())
-                        .build();
-                department = departmentRepository.save(department);
+                throw new IllegalArgumentException("Department name is invalid. The valid ones are 'ADMIN', 'HR','STAFF', 'MEMBERS' !");
             }
         }
         Employee employee = Employee.builder()
@@ -59,7 +66,7 @@ public class EmployeeService {
                 .department(newAddedEmployee.getDepartment() != null ?
                         DepartmentResponse.builder()
                                 .id(newAddedEmployee.getDepartment().getId())
-                                .name(newAddedEmployee.getDepartment().getName())
+                                .name(newAddedEmployee.getDepartment().getName().toString())
                                 .managerId(newAddedEmployee.getDepartment().getManagerId())
                                 .build()
                         : null)
@@ -81,7 +88,7 @@ public class EmployeeService {
                         .department(employee.getDepartment() != null ?
                                 DepartmentResponse.builder()
                                         .id(employee.getDepartment().getId())
-                                        .name(employee.getDepartment().getName())
+                                        .name(employee.getDepartment().getName().toString())
                                         .managerId(employee.getDepartment().getManagerId())
                                         .build()
                                 : null)
@@ -106,7 +113,7 @@ public class EmployeeService {
                 .department(employee.getDepartment() != null ?
                         DepartmentResponse.builder()
                                 .id(employee.getDepartment().getId())
-                                .name(employee.getDepartment().getName())
+                                .name(employee.getDepartment().getName().toString())
                                 .managerId(employee.getDepartment().getManagerId())
                                 .build()
                         : null)
@@ -122,9 +129,10 @@ public class EmployeeService {
         }
         Department department = null;
         if(employeeRequest.getDepartment() != null){
+            DepartmentName depNameToUpdate = DepartmentName.valueOf(employeeRequest.getDepartment().getName().trim().toUpperCase());
           department = Department.builder()
                     .id(employeeToUpdate.getDepartment().getId())
-                    .name(employeeRequest.getDepartment().getName())
+                    .name(depNameToUpdate)
                     .managerId(employeeToUpdate.getDepartment().getManagerId())
                     .build();
           department = departmentRepository.save(department);
@@ -147,7 +155,7 @@ public class EmployeeService {
                 .department(updatedEmployee.getDepartment() != null ?
                         DepartmentResponse.builder()
                                 .id(updatedEmployee.getDepartment().getId())
-                                .name(updatedEmployee.getDepartment().getName())
+                                .name(updatedEmployee.getDepartment().getName().toString())
                                 .managerId(updatedEmployee.getDepartment().getManagerId())
                                 .build()
                         : null)

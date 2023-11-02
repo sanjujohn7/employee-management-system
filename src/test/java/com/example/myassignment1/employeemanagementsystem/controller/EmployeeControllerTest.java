@@ -4,6 +4,7 @@ import com.example.myassignment1.employeemanagementsystem.contract.DepartmentReq
 import com.example.myassignment1.employeemanagementsystem.contract.DepartmentResponse;
 import com.example.myassignment1.employeemanagementsystem.contract.EmployeeRequest;
 import com.example.myassignment1.employeemanagementsystem.contract.EmployeeResponse;
+import com.example.myassignment1.employeemanagementsystem.model.DepartmentName;
 import com.example.myassignment1.employeemanagementsystem.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

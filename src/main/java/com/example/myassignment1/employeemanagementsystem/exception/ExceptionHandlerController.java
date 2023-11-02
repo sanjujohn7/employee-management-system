@@ -15,6 +15,12 @@ public class ExceptionHandlerController {
         String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ResponseEntity.badRequest().body(errorMessage);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleValidationException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
     @ExceptionHandler(EmployeeNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
@@ -25,7 +31,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(DeleteNotSuccessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public String handleEmployeeNotFoundException(DeleteNotSuccessException ex) {
+    public String handleDeleteNotSuccessException(DeleteNotSuccessException ex) {
         return ex.getMessage();
     }
 

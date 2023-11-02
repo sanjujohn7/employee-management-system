@@ -18,6 +18,6 @@ public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String name;
+    private DepartmentName name;
     private Long managerId;
 }

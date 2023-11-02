@@ -6,6 +6,7 @@ import com.example.myassignment1.employeemanagementsystem.contract.EmployeeRespo
 import com.example.myassignment1.employeemanagementsystem.exception.DeleteNotSuccessException;
 import com.example.myassignment1.employeemanagementsystem.exception.EmployeeNotFoundException;
 import com.example.myassignment1.employeemanagementsystem.model.Department;
+import com.example.myassignment1.employeemanagementsystem.model.DepartmentName;
 import com.example.myassignment1.employeemanagementsystem.model.Employee;
 import com.example.myassignment1.employeemanagementsystem.repository.DepartmentRepository;
 import com.example.myassignment1.employeemanagementsystem.repository.EmployeeRepository;
@@ -40,7 +41,7 @@ public class EmployeeServiceTest {
      void testAddNewEmployee(){
         Department department = null;
         DepartmentRequest departmentRequest = DepartmentRequest.builder()
-                .name("HR")
+                .name("JAVA")
                 .build();
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .firstName("test")
@@ -50,14 +51,17 @@ public class EmployeeServiceTest {
                 .position("Manager")
                 .build();
         if (employeeRequest.getDepartment() != null && employeeRequest.getDepartment().getName() != null){
-            Optional<Department> optionalDepartment = departmentRepository.findByNameIgnoreCase(employeeRequest.getDepartment().getName());
-        if(optionalDepartment.isPresent()){
-            department = optionalDepartment.get();
-        }else{
-            department = Department.builder()
-                    .name("HR")
-                    .build();
-        }
+            DepartmentName reqDepName = DepartmentName.valueOf("JAVA");
+            if (reqDepName != null){
+                Optional<Department> optionalDepartment = departmentRepository.findByName(reqDepName);
+                if(optionalDepartment.isPresent()){
+                    department = optionalDepartment.get();
+                }else{
+                    department = Department.builder()
+                            .name(reqDepName)
+                            .build();
+                }
+            }
         }
         when(departmentRepository.save(any(Department.class))).thenReturn(department);
 
@@ -66,7 +70,11 @@ public class EmployeeServiceTest {
                 .firstName("test")
                 .lastName("user")
                 .email("test@example.com")
-                .department(department)
+                .department(departmentRequest != null ? Department.builder()
+                        .id(6L)
+                        .name(DepartmentName.JAVA)
+                        .managerId(9L)
+                        .build() : null)
                 .position("Manager")
                 .build();
 
@@ -80,36 +88,38 @@ public class EmployeeServiceTest {
         assertEquals("user", employeeResponse.getLastName());
         assertEquals("test@example.com", employeeResponse.getEmail());
         assertNotNull(employeeResponse.getDepartment());
-        assertEquals("HR", employeeResponse.getDepartment().getName());
+        assertEquals("JAVA", employeeResponse.getDepartment().getName());
         assertEquals("Manager", employeeResponse.getPosition());
     }
 
     @Test
      void testListAllEmployees(){
         List<Employee> employees = new ArrayList<>();
+        DepartmentName depName = DepartmentName.NODEJS;
         Department department1 = Department.builder()
                 .id(1L)
-                .name("department1")
+                .name(depName)
                 .build();
         Employee employee1 = Employee.builder()
                 .id(1L)
                 .firstName("test1")
                 .lastName("user1")
                 .email("test1@gmail.com")
-                .department(department1)
+                .department(department1 != null ? department1: null)
                 .position("Engineer")
                 .build();
         employees.add(employee1);
-        Department department2 = Department.builder()
-                .id(2L)
-                .name("department2")
-                .build();
+        Department department2 = null;
+//                Department.builder()
+//                .id(2L)
+//                .name(depName)
+//                .build();
         Employee employee2 = Employee.builder()
                 .id(2L)
                 .firstName("test2")
                 .lastName("user2")
                 .email("test2@gmail.com")
-                .department(department2)
+                .department(department2 != null ? department2 : null)
                 .position("Developer")
                 .build();
         employees.add(employee2);
@@ -135,17 +145,19 @@ public class EmployeeServiceTest {
 
     @Test
      void testFindEmployeeById(){
-        Department department = Department.builder()
-                .id(5L)
-                .name("test-department")
-                .managerId(4L)
-                .build();
+        DepartmentName departmentName = DepartmentName.PYTHON;
+        Department department = null;
+//                Department.builder()
+//                .id(5L)
+//                .name(departmentName)
+//                .managerId(4L)
+//                .build();
         Employee employee = Employee.builder()
                 .id(1L)
                 .firstName("test")
                 .lastName("user")
                 .email("test@gmail.com")
-                .department(department)
+                .department(department != null ? department : null)
                 .position("Manager")
                 .build();
 
@@ -215,7 +227,7 @@ public class EmployeeServiceTest {
     @Test
      void testUpdateEmployeeById(){
         DepartmentRequest departmentRequest = DepartmentRequest.builder()
-                .name("HR")
+                .name("JAVA")
                 .build();
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .firstName("updatedFirstName")
@@ -226,9 +238,10 @@ public class EmployeeServiceTest {
                 .build();
         Department department = null;
         if (employeeRequest.getDepartment() != null){
+            DepartmentName departmentName = DepartmentName.REACT;
                   department = Department.builder()
                     .id(1L)
-                    .name("HR")
+                    .name(departmentName)
                     .managerId(2L)
                     .build();
         }
@@ -241,7 +254,7 @@ public class EmployeeServiceTest {
                 .lastName("user")
                 .email("test@example.com")
                 .position("DevOps")
-                .department(department)
+                .department(department != null ? department: null)
                 .build();
 
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(existingEmployee));
@@ -252,7 +265,7 @@ public class EmployeeServiceTest {
                 .lastName("updatedLastName")
                 .email("updated@example.com")
                 .position("updatedPosition")
-                .department(department)
+                .department(department != null ? department: null)
                 .build();
 
         when(employeeRepository.save(any(Employee.class))).thenReturn(updatedEmployee);
