@@ -25,7 +25,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(DeleteNotSuccessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public String handleEmployeeNotFoundException(DeleteNotSuccessException ex) {
+    public String handleDeleteNotSuccessException(DeleteNotSuccessException ex) {
         return ex.getMessage();
     }
 

@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
-    private EmployeeRepository employeeRepository;
-    private DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
     @Autowired
     public EmployeeService(EmployeeRepository employeeRepository, DepartmentRepository departmentRepository){
         this.employeeRepository = employeeRepository;
@@ -30,23 +30,23 @@ public class EmployeeService {
         if (employeeRequest.getDepartment() != null && employeeRequest.getDepartment().getName() != null){
 
             Optional<Department> optionalDepartment =
-                    departmentRepository.findByNameIgnoreCase(employeeRequest.getDepartment().getName());
+                    departmentRepository.findByNameIgnoreCase(employeeRequest.getDepartment().getName().trim());
 
             if (optionalDepartment.isPresent()) {
                 department = optionalDepartment.get();
             }else{
                 department = Department.builder()
-                        .name(employeeRequest.getDepartment().getName())
+                        .name(employeeRequest.getDepartment().getName().trim())
                         .build();
                 department = departmentRepository.save(department);
             }
         }
         Employee employee = Employee.builder()
-                .firstName(employeeRequest.getFirstName())
-                .lastName(employeeRequest.getLastName())
-                .email(employeeRequest.getEmail())
+                .firstName(employeeRequest.getFirstName().trim())
+                .lastName(employeeRequest.getLastName().trim())
+                .email(employeeRequest.getEmail().trim().toLowerCase())
                 .department(department)
-                .position(employeeRequest.getPosition())
+                .position(employeeRequest.getPosition().trim())
                 .build();
 
         Employee newAddedEmployee = employeeRepository.save(employee);
